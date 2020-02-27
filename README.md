@@ -8,14 +8,14 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/hklchung/repo">
+  <a href="https://github.com/hklchung/TravelPlanner">
     <img src="https://scontent-syd2-1.xx.fbcdn.net/v/t1.0-9/88099705_114743766784417_1251650459005878272_n.png?_nc_cat=106&_nc_sid=e007fa&_nc_oc=AQlP56J-Nt5Je3oH09o6ZgvIwtgIIUzfoP49wKEH50ZSTuPw6pEJ8cLXYwu6NRxnTHY&_nc_ht=scontent-syd2-1.xx&oh=ad9ee1c94384a5b508bd25579a1f7681&oe=5EB5114F" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">Embark</h3>
 
   <p align="center">
-    This is the home to [Embark](embarkapp.co), the next generation itinerary planning platform for everyone. #itinerary #machinelearning
+  This is the home to <a href="https://embarkapp.co">Embark</a>, the next generation itinerary planning platform for everyone. #itinerary #machinelearning
     <br />
     <a href="https://github.com/hklchung/TravelPlanner"><strong>Explore the docs »</strong></a>
     <br />
