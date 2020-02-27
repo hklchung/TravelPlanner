@@ -15,7 +15,7 @@
   <h3 align="center">Embark</h3>
 
   <p align="center">
-    This is the home to [Embark][embarkapp.co], the next generation itinerary planning platform for everyone. #itinerary #machinelearning
+    This is the home to [Embark](embarkapp.co), the next generation itinerary planning platform for everyone. #itinerary #machinelearning
     <br />
     <a href="https://github.com/hklchung/TravelPlanner"><strong>Explore the docs »</strong></a>
     <br />
