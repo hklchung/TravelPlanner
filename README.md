@@ -120,9 +120,9 @@ Project Link: [https://github.com/hklchung/TravelPlanner](https://github.com/hkl
 This project exists thanks to all the people who contribute. 
 
   
-  [Leslie Chung](https://github.com/hklchung)
-  [Edward Ho] (https://github.com/edwardmfho)
-  [Jeanse Ng] (#)
+* [Leslie Chung](https://github.com/hklchung)
+* [Edward Ho](https://github.com/edwardmfho)
+* [Jeanse Ng](#)
 
 
 
