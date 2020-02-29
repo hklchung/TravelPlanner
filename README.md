@@ -66,7 +66,7 @@ To run the Embark development version, follow these simple steps.
 
 ### Prerequisites
 
-* Make sure you have installed the approrpiate Python version in your workspace. These include:
+Make sure you have installed the approrpiate Python version in your workspace. These include:
 
 * Python 3.6+
 
