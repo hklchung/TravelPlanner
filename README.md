@@ -66,19 +66,21 @@ To run the Embark development version, follow these simple steps.
 
 ### Prerequisites
 
-* Make sure you have installed the approrpiate environment on your workspace. These include:
+* Make sure you have installed the approrpiate Python version in your workspace. These include:
 
 * Python 3.6+
-* Anaconda
 
-and the requires depedencies for the repo:
+and the required depedencies for running the scripts:
 
 * Pandas
 * Numpy
 * Json
 * Geopy
 
-These could be easily found on Anaconda. 
+These could be easily found on Anaconda or installed with pip, e.g.
+```sh
+pip install geopy
+```
 
 ### Installation
  
