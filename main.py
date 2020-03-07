@@ -9,60 +9,60 @@
 
 import pandas as pd
 import numpy as np
-import json
-# import request
-import string
 import time as tm
 import datetime
-from data import data
 import geopy.distance
+from trv_utils import overlap_time
+from trv_utils import update_itin
+pd.options.mode.chained_assignment = None 
 
 test_long = 151.239536 
 test_lat = -33.939442
 
+data_pwd = "../../Data/Sydney.xlsx"
+db = pd.read_excel(data_pwd, sheet_name = 0, header = 0)
+db = db[db['ready_f'] == 1]
+db[['name', 'category', 'location','timezone_type']] = db[['name', 'category', 'location','timezone_type']].astype(str)
+db[['timezone', 'postcode']] = db[['timezone', 'postcode']].astype(int)
+db[['latitude', 'longtitude', 'cost_min', 'cost_max']] = db[['latitude', 'longtitude', 'cost_min', 'cost_max']].astype(float)
+db[['free_f', 'indoor_f', 'outdoor_f', 'family_f']] = db[['free_f', 'indoor_f', 'outdoor_f', 'family_f']].astype(bool)
+db = db.reset_index(drop=True)
 
 class Embark:
 
     def __init__(self):
 
-        # Usr Long Lat - to do: geolocation
+        # Need to use Google or something to find user real time location
         self.usr_long = test_long
         self.usr_lat = test_lat
 
-
         print("Hello, how should we call you?")
-        self.name = raw_input()
+        self.name = input()
 
-        print("{}, thanks for using Embark! How old are you?".format(self.name))
-        print("Which day are you planning for a trip?")
-        self.day = raw_input()
+        print("{}, which day are you planning for a trip?".format(self.name))
+        self.day = input()
         print("Your trip will start from (time):")
-        self.begin_hr = raw_input()
+        self.begin_hr = input()
         print("Your trip will end at (time) :")
-        self.end_hr = raw_input()
+        self.end_hr = input()
         print("How many locations would you like to visit?")
-        self.loc_count = raw_input()
+        self.loc_count = input()
         print("How much time would you allow for travelling in total (in hours)?")
-        self.trv_time = raw_input()
-        print("Your first stop preference (short= 1, medium = 1, long = 2)? ")
-        self.trv_dist = raw_input()
-        print("What kind of activities do you prefer? Culture, Nightlife, Shopping, Theme Park, Nature?")
-        self.pref = raw_input()
+        self.trv_time = input()
+        print("How far would you travel for your first stop (short= 1, medium = 2, long = 3)?")
+        self.trv_dist = input()
         print("Thanks for the information! We will now crunch some numbers and find locations that best suit your requirements!")
 
-        self.usr_choice = ""
-        self.first_long = 0
-        self.first_lat = 0
         self.opening = ['', 'mon_o', 'tue_o', 'wed_o','thurs_o', 'fri_o', 'sat_o', 'sun_o']
         self.closing = ['', 'mon_c', 'tue_c', 'wed_c','thurs_c', 'fri_c', 'sat_c', 'sun_c']
-
+        
+        self.itin = pd.DataFrame()
 
     def get_google_client(self):
         pass
 
-
     def first_loc_candidate(self):
-        db_temp = data
+        db_temp = db.copy()
 
         # initialize db_temp column travel distance
         db_temp['usr_trav_dist'] = np.nan
@@ -70,76 +70,79 @@ class Embark:
         for i in range(0, len(db_temp.index)):
             db_temp.iat[i,db_temp.columns.get_loc("usr_trav_dist")] = geopy.distance.geodesic((self.usr_lat, self.usr_long), 
                                                                             (db_temp['latitude'][i], db_temp['longtitude'][i])).km
-        if self.trv_dist == 0:
+        if self.trv_dist == '1':
             rcmd1 = db_temp[db_temp['usr_trav_dist'] <= 5]
-        elif self.trv_dist  == 1:
+        elif self.trv_dist == '2':
             rcmd1 = db_temp[db_temp['usr_trav_dist'] <= 10]
         else:
-            rcmd1 = db_temp[db_temp['usr_trav_dist'] <= 20]
+            rcmd1 = db_temp[db_temp['usr_trav_dist'] <= 30]
+        
+        rcmd1['overlap'] = np.nan
+        #error 
+        rcmd1['overlap'] = rcmd1.apply(lambda x: overlap_time(int(self.begin_hr), 
+             int(self.begin_hr) + 2, 
+             x[self.opening[int(self.day)]], 
+             x[self.closing[int(self.day)]]), axis=1)
+        rcmd1 = rcmd1[rcmd1['overlap'] >= 2].sample(n = 5)
+        rcmd1.reset_index(inplace = True, drop = True)
         return rcmd1
     
     def select_first(self):    
         first_loc = self.first_loc_candidate()
-        print("We suggest the following to be your your first stop, pick one out of five!")
-        print(first_loc.head(5))
+        print("These look like good spots to start your trip, pick one on the list!")
+        print(first_loc['name'])
+        print("Which one will be your first stop? (Pick from 0-4)")
+        self.usr_choice = input()
+        first_choice = pd.DataFrame(first_loc.iloc[int(self.usr_choice), :]).transpose()
+        self.itin = update_itin(self.itin, first_choice)
+        self.begin_hr = int(self.begin_hr) + 3 # ERROR: need to upate this to Google API, atm assumes spending 2 hours at loc and 1 hour travel
+        self.trv_time = int(self.trv_time) - 1 # Error: assumes 1 hour travel time between every location
+        return first_choice     
 
-        print("Which one will be your first stop? (0-5)")
-        temp = raw_input()
-        self.usr_choice = int(temp) - 1
-        first_choice = first_loc.iloc[self.usr_choice]
-        first_choice = first_choice.to_frame().transpose()
-        print(first_loc.head())
-        return first_choice, first_loc
-
-    def overlap_time(self, usr_t1, usr_t2, loc_t1, loc_t2):
-        start = datetime.datetime.combine(datetime.date.today(),max(loc_t1, usr_t1))
-        end = datetime.datetime.combine(datetime.date.today(),min(loc_t2, usr_t2))
-        delta = (end - start).total_seconds()/3600
-        return delta
-
-
+    def next_loc_candidate(self, n):
+        self.itin.reset_index(inplace = True, drop = True)
+        self.curr_lat = self.itin['latitude'][n]
+        self.curr_long = self.itin['longtitude'][n]
+        
+        db_temp = db.copy()
+        db_temp['usr_trav_dist'] = np.nan
+        # Fina travel distance between current location and all other locations
+        for i in range(0, len(db_temp.index)):
+            db_temp.iat[i,db_temp.columns.get_loc("usr_trav_dist")] = geopy.distance.geodesic((self.curr_lat, self.curr_long), 
+                                                                            (db_temp['latitude'][i], db_temp['longtitude'][i])).km
+        
+        rcmd2 = db_temp[db_temp['usr_trav_dist'] <= 10]
+        # Final overlapping hours
+        rcmd2['overlap'] = np.nan
+        rcmd2['overlap'] = rcmd2.apply(lambda x: overlap_time(int(self.begin_hr), 
+             int(self.begin_hr) + 2, 
+             x[self.opening[int(self.day)]], 
+             x[self.closing[int(self.day)]]), axis=1)
+        rcmd2 = rcmd2[rcmd2['overlap'] >= 2].sample(n = 5)
+        rcmd2.reset_index(inplace = True, drop = True)
+        
+        print("These look like good spots to go next, pick one on the list!")
+        print(rcmd2['name'])
+        print("Which one will be your first stop? (Pick from 0-4)")
+        self.usr_choice = input()
+        next_choice = pd.DataFrame(rcmd2.iloc[int(self.usr_choice), :]).transpose()
+        
+        self.itin = update_itin(self.itin, next_choice)
+        self.begin_hr = int(self.begin_hr) + 3 # ERROR: need to upate this to Google API, atm assumes spending 2 hours at loc and 1 hour travel
+        self.trv_time = int(self.trv_time) - 1 # Error: assumes 1 hour travel time between every location
+        return next_choice
+    
     def plan_trip(self):
-        first_choice, rcmd = self.select_first()
-        print(first_choice.head())
-        plan_lat = first_choice['latitude'].iloc[0]
-        plan_long = first_choice['longtitude'].iloc[0]
-        rcmd_fil = rcmd.copy(deep=True)
-        rcmd_fil.loc['trav_dist'] = np.nan
-        # for i in range(0, len(rcmd_fil.index)):
-        #     rcmd_fil.iat[i,rcmd_fil.columns.get_loc("trav_dist")] = geopy.distance.geodesic((plan_lat, plan_long), 
-        #                                                                     (rcmd_fil['latitude'][i], rcmd_fil['longtitude'][i])).km
-        # remove location that does not fit into users' timeframe
-        
-        o_time = []
-        for i in range(0, len(rcmd_fil)):
-            new = self.overlap_time(datetime.time(int(self.begin_hr)), 
-                        datetime.time(int(self.end_hr)), 
-                        rcmd_fil.iloc[i][self.opening[int(self.day)]], 
-                        rcmd_fil.iloc[i][self.closing[int(self.day)]])
-            o_time.append(new)
-        rcmd_fil['o_time'] = o_time
-        rcmd_fil = rcmd.loc[rcmd['o_time'] > 1]
-        rcmd_fil_time = rcmd_fil.copy(deep=True)
-        rcmd_fil_time = rcmd_fil[rcmd_fil[self.closing[int(self.day)]].apply(lambda x: x.hour) - int(self.begin_hr) > 2]
-        
-
-        # sort by distance (and should have a function to calculate the next stop according to the second stop, and so on)
-        rcmd_fil_time = rcmd_fil_time.sort_values('trav_dist')
-
-        sec_loc_count = int(self.loc_count) - 1
-
-        if sec_loc_count > 0:
-            rcmd_final = rcmd_fil_time[:sec_loc_count]
-
-        else:
-            rcmd_final = rcmd_fil_time[:1]
-
-        return rcmd_final
+        first = self.select_first()
+        for i in range(0, int(self.loc_count)-1):
+            next1 = self.next_loc_candidate(i)
+        itin = self.itin
+        return first, next1, itin
 
     def print_itinerary(self):
-        trip = self.plan_trip()
+        _, _, trip = self.plan_trip()
         print("Here is your itinerary! Enjoy your trip:")
-        print(type(trip))
+        print(trip.iloc[:, 0:2])
 
         # Call Google Map API to calculate actual travel time for each hotspot
 
@@ -150,6 +153,3 @@ def main():
 
 
 main()
-
-    
-
