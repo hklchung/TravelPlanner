@@ -2,6 +2,8 @@ import pandas as pd
 import datetime
 import random
 import decimal
+import pyodbc
+from gcp_pwd import *
 
 def overlap_time(usr_t1, usr_t2, loc_t1, loc_t2):
     usr_t1 = datetime.time(int(usr_t1))
@@ -24,6 +26,15 @@ def grab_local_files():
     db[['latitude', 'longtitude', 'cost_min', 'cost_max']] = db[['latitude', 'longtitude', 'cost_min', 'cost_max']].astype(float)
     db[['free_f', 'indoor_f', 'outdoor_f', 'family_f']] = db[['free_f', 'indoor_f', 'outdoor_f', 'family_f']].astype(bool)
     db = db.reset_index(drop=True)
+    return(db)
+    
+def grab_gcp_data():
+    cnxn = pyodbc.connect(cs) #cs is from gcp_pwd, not available on GitHub for security reasons
+    db = pd.read_sql_query('select * from dbo.AppLocations where ready_f = 1', cnxn)
+    db[['name', 'category', 'location','timezone_type']] = db[['name', 'category', 'location','timezone_type']].astype(str)
+    db[['timezone', 'postcode']] = db[['timezone', 'postcode']].astype(int)
+    db[['latitude', 'longtitude', 'cost_min', 'cost_max']] = db[['latitude', 'longtitude', 'cost_min', 'cost_max']].astype(float)
+    db[['free_f', 'indoor_f', 'outdoor_f', 'family_f']] = db[['free_f', 'indoor_f', 'outdoor_f', 'family_f']].astype(bool)
     return(db)
     
 def test_latlong(randomiser = True):
