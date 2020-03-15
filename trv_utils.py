@@ -17,8 +17,7 @@ def update_itin(curr, new):
     updated = curr.append(new)
     return updated
 
-def grab_local_files():
-    data_pwd = "../../Data/Sydney.xlsx"
+def grab_local_files(data_pwd = "../../Data/Sydney.xlsx"):
     db = pd.read_excel(data_pwd, sheet_name = 0, header = 0)
     db = db[db['ready_f'] == 1]
     db[['name', 'category', 'location','timezone_type']] = db[['name', 'category', 'location','timezone_type']].astype(str)
