@@ -17,5 +17,5 @@ from django.contrib import admin
 from django.urls import path, include
 from . import views
 urlpatterns = [
-    path('', views.user_input),
+    path('explore', views.user_input),
 ]
