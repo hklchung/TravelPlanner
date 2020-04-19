@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>115457459627-68uo1rbdm3mi8qjhagul1lmcnc99a1fb.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.115457459627-68uo1rbdm3mi8qjhagul1lmcnc99a1fb</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAK2M-S0n2C7OMxXCwhPH_gVagRaATzggs</string>
+	<key>GCM_SENDER_ID</key>
+	<string>115457459627</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.invivo.CustomLoginDemo</string>
+	<key>PROJECT_ID</key>
+	<string>customlogindemo-66d36</string>
+	<key>STORAGE_BUCKET</key>
+	<string>customlogindemo-66d36.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:115457459627:ios:2b07250c7b9c38a7e97eee</string>
+	<key>DATABASE_URL</key>
+	<string>https://customlogindemo-66d36.firebaseio.com</string>
+</dict>
+</plist>
